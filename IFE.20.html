@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        *{
+            margin:0;
+            padding:0;}
+        textarea{
+
+            margin-bottom: 10px;
+        }
+
+        button{
+            height:25px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        #right_in{
+            margin-right: 25px;
+        }
+
+        #result div{
+            display: inline-block;
+            padding:0 15px;
+            height: 30px;
+            margin-left: 5px;
+
+            background-color: blue;
+            font-size: 20px;
+            text-align: center;
+            color: #fff;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+
+
+<textarea  id="inputvalue" cols="40" rows="15"></textarea></br>
+<button id="left_in">左侧入</button>
+<button id="right_in"  >右侧入</button>
+<button id="left_out" >左侧出</button>
+<button id="right_out"  >右侧出</button>
+<input type="text" placeholder="请输入查询的内容" id="searchValue"/>
+<button id="search">查询</button>
+<div id="result"></div>
+
+
+<script type="text/javascript">
+    //遍历数组
+    function each(arr,fn){
+        for(var i =0;i<arr.length;i++){
+            fn(arr[i],i);
+        }
+
+    }
+
+    //拆分输入的内容
+    function split(text){
+       var arr=[];
+        arr= (text).split(/[,，；;、\s\n]+/);
+        console.log(arr);
+        return arr;
+
+    }
+
+
+
+    window.onload = function() {
+        var lf_in = document.getElementById("left_in");
+        var rg_in = document.getElementById("right_in");
+        var lf_out = document.getElementById("left_out");
+        var rg_out = document.getElementById("right_out");
+        var result = document.getElementById("result");
+        var searchButton = document.getElementById("search");
+
+
+        //定义
+        var data = {
+            str: [],
+
+            //左边插入:
+            leftPush: function (arr) {
+                for(var i in arr) {
+                    this.str.unshift(arr[i]);
+                }
+                this.render();
+            },
+
+            //右边插入
+            rightPush: function (arr) {
+               for(var i in arr){
+                   this.str.push(arr[i]);
+               }
+                this.render();
+            },
+
+            isEmpty: function() {
+                return (this.str.length == 0);
+            },
+
+            //左边删除
+            leftDelete: function () {
+                if (!this.isEmpty()) {
+                    alert(this.str.shift());
+                    this.render();
+                } else {
+                    alert("队列已空！");
+                }
+
+            },
+            //右边删除
+            rightDelete: function () {
+                if (!this.isEmpty()) {
+                    alert(this.str.pop());
+                    this.render();
+                } else {
+                    alert("队列已空！");
+                }
+
+            },
+            //渲染
+            render: function () {
+                var str = "";
+                each(this.str, function (item) {
+                    str += ("<div>" + item+ "</div>")});
+                result.innerHTML = str;
+                addDelete();
+            },
+
+            deleteId: function (id) {
+                console.log(id);
+                this.str.splice(id, 1);
+                this.render();
+            }
+        };
+
+
+        //查询内容，并更改样式
+
+        function search(text){
+            for(var i=0;i<result.childNodes.length;i++)
+            {
+                result.childNodes[i].style.color='#fff';
+                result.childNodes[i].style.background='blue';
+            }
+            for(var i =0;i<result.childNodes.length;i++){
+           if(result.childNodes[i].innerHTML.indexOf(text)!=-1){
+               result.childNodes[i].style.color = "red";
+               result.childNodes[i].style.background = "yellow";
+           }else{
+               alert("并没有改内容!")
+           }
+       }
+
+        }
+
+        //为每一个div绑定删除事件,用闭包，这个闭包改了两次，先开始就是犯了常犯的错误，console.log每次都是最后循环的值，逻辑要清晰
+        function addDelete() {
+            for (var i = 0; i < result.childNodes.length; i++) {
+                !function (i) {
+                    result.childNodes[i].addEventListener('click', function () {
+                        return data.deleteId(i);
+                    })
+                }(i);
+            }
+        }
+
+
+        //为按钮绑定函数
+        lf_in.addEventListener('click',function () {
+
+            var input = split((document.getElementById("inputvalue")).value);
+            if(input==""){
+                alert("请输入内容！");
+            }else {
+                data.leftPush(input);
+            }
+        });
+
+        rg_in.addEventListener('click',function () {
+            var input = split((document.getElementById("inputvalue")).value);
+
+           if(input==""){
+               alert("请输入内容！");
+           }else {
+               data.rightPush(input);
+           }
+
+        });
+        lf_out.addEventListener("click", function () {
+            data.leftDelete();
+        });
+
+        rg_out.addEventListener("click", function () {
+            data.rightDelete();
+        });
+
+            searchButton.addEventListener('click',function(){
+        var searchValue = document.getElementById("searchValue").value;
+
+        search(searchValue);
+
+    })
+    }
+</script>
+</body>
+</html>
